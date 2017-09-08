@@ -36,6 +36,11 @@ multi-stop:
 	@make dev2-stop
 	@make dev3-stop
 
+multi-clean:
+	@make dev1-clean
+	@make dev2-clean
+	@make dev3-clean
+
 dev1-build: KIND=dev1
 dev1-build: internal-build
 
@@ -48,6 +53,9 @@ dev1-stop: internal-stop
 dev1-attach: KIND=dev1
 dev1-attach: internal-attach
 
+dev1-clean: KIND=dev1
+dev1-clean: internal-clean
+
 dev2-start: KIND=dev2
 dev2-start: internal-start
 
@@ -57,6 +65,9 @@ dev2-stop: internal-stop
 dev2-attach: KIND=dev2
 dev2-attach: internal-attach
 
+dev2-clean: KIND=dev2
+dev2-clean: internal-clean
+
 dev3-start: KIND=dev3
 dev3-start: internal-start
 
@@ -65,6 +76,9 @@ dev3-stop: internal-stop
 
 dev3-attach: KIND=dev3
 dev3-attach: internal-attach
+
+dev3-clean: KIND=dev3
+dev3-clean: internal-clean
 
 dialyzer:
 	@./rebar3 dialyzer
@@ -138,15 +152,22 @@ internal-stop: $$(KIND)
 
 internal-attach: $$(KIND)
 	@./_build/$(KIND)/$(CORE) attach
+	
+internal-clean: $$(KIND)
+	@rm -rf ./_build/$(KIND)/rel/epoch/data/*
+	@rm -rf ./_build/$(KIND)/rel/epoch/blocks/*
+	@rm -rf ./config/$(KIND)/sys.config
+	@rm -rf ./_build/$(KIND)/rel/*/log/*
+
 
 
 .PHONY: \
 	local-build local-start local-stop local-attach \
 	prod-build prod-start prod-stop prod-attach \
-	multi-build, multi-start, multi-stop,\
-	dev1-start, dev1-stop, dev1-attach\
-	dev2-start, dev2-stop, dev2-attach\
-	dev3-start, dev3-stop, dev3-attach\
+	multi-build, multi-start, multi-stop, multi-clean \
+	dev1-start, dev1-stop, dev1-attach, dev1-clean \
+	dev2-start, dev2-stop, dev2-attach, dev2-clean \
+	dev3-start, dev3-stop, dev3-attach, dev3-clean \
 	dialyzer \
 	test \
 	kill killall \
