@@ -15,7 +15,7 @@ local-attach: KIND=local
 local-attach: internal-attach
 
 prod-build: KIND=prod
-local-build: config/sys.config internal-build
+prod-build: config/sys.config internal-build
 
 prod-start: KIND=prod
 prod-start: internal-start
@@ -143,6 +143,10 @@ internal-attach: $$(KIND)
 .PHONY: \
 	local-build local-start local-stop local-attach \
 	prod-build prod-start prod-stop prod-attach \
+	multi-build, multi-start, multi-stop,\
+	dev1-start, dev1-stop, dev1-attach\
+	dev2-start, dev2-stop, dev2-attach\
+	dev3-start, dev3-stop, dev3-attach\
 	dialyzer \
 	test \
 	kill killall \
