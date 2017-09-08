@@ -16,7 +16,7 @@ mine_block_test_() ->
              application:start(crypto),
              meck:new(aec_blocks, [passthrough]),
              meck:new(aec_headers, [passthrough]),
-             meck:new(aec_pow_sha256, [passthrough]),
+             meck:new(aec_pow, [passthrough]),
              meck:new(aec_tx, [passthrough]),
              meck:new(aec_governance, [passthrough])
      end,
@@ -24,7 +24,7 @@ mine_block_test_() ->
              application:stop(crypto),
              meck:unload(aec_blocks),
              meck:unload(aec_headers),
-             meck:unload(aec_pow_sha256),
+             meck:unload(aec_pow),
              meck:unload(aec_tx),
              meck:unload(aec_governance)
      end,
@@ -33,7 +33,7 @@ mine_block_test_() ->
        fun() ->
                Trees = #trees{accounts = [#account{pubkey = <<"pubkey">>}]},
                meck:expect(aec_blocks, top, 0, {ok, #block{difficulty = ?MAX_DIFFICULTY}}),
-               meck:expect(aec_pow_sha256, pick_nonce, 0, 1),
+               meck:expect(aec_pow, pick_nonce, 0, 1),
                meck:expect(aec_tx, apply_signed, 3, {ok, Trees}),
 
                {ok, Block} = ?TEST_MODULE:mine(),
@@ -46,7 +46,7 @@ mine_block_test_() ->
        fun() ->
                Trees = #trees{accounts = [#account{pubkey = <<"pubkey">>}]},
                meck:expect(aec_blocks, top, 0, {ok, #block{difficulty = 1}}),
-               meck:expect(aec_pow_sha256, pick_nonce, 0, 1),
+               meck:expect(aec_pow, pick_nonce, 0, 1),
                meck:expect(aec_tx, apply_signed, 3, {ok, Trees}),
 
                ?assertEqual({error, generation_count_exhausted}, ?TEST_MODULE:mine())
@@ -69,7 +69,7 @@ mine_block_test_() ->
                meck:expect(aec_headers, get_by_height, 1,
                            {ok, #header{height = 20,
                                         time = Now - 50000}}),
-               meck:expect(aec_pow_sha256, pick_nonce, 0, 1),
+               meck:expect(aec_pow, pick_nonce, 0, 1),
                meck:expect(aec_tx, apply_signed, 3, {ok, Trees}),
                meck:expect(aec_governance, recalculate_difficulty_frequency, 0, 10),
                meck:expect(aec_governance, expected_block_mine_rate, 0, 5),
@@ -94,7 +94,7 @@ mine_block_test_() ->
                meck:expect(aec_headers, get_by_height, 1,
                            {ok, #header{height = 190,
                                         time = Now - 11000}}),
-               meck:expect(aec_pow_sha256, pick_nonce, 0, 1),
+               meck:expect(aec_pow, pick_nonce, 0, 1),
                meck:expect(aec_tx, apply_signed, 3, {ok, Trees}),
                meck:expect(aec_governance, recalculate_difficulty_frequency, 0, 10),
                meck:expect(aec_governance, expected_block_mine_rate, 0, 100000),

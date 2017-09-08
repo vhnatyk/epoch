@@ -117,7 +117,7 @@ $(LIBDIR):
 
 $(CUCKOO_SRCS): deps
 
-$(CUCKOO_OBJECTS): deps $(CUCKOO_SRCS)
+$(CUCKOO_OBJECTS): $(CUCKOO_SRCS)
 
 clean: ## Clean all files
 	@rm -f $(OBJECTS) $(LIB_SO)

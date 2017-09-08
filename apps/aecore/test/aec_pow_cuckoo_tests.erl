@@ -14,12 +14,12 @@
 
 pow_test_() ->
     {setup,
-     fun() -> ok end ,
-     fun(_) -> ok end,
+     fun setup/0,
+     fun teardown/1,
      [{"Fail if retry count is zero",
        fun() ->
                ?assertEqual({error, generation_count_exhausted},
-                            ?TEST_MODULE:generate(<<"hello there">>, 5555, 0, 7, 7, 0))
+                            ?TEST_MODULE:generate(<<"hello there">>, 5555, 0))
        end},
       {"Generate with a winning nonce and big difficulty, verify it",
        {timeout, 60,
@@ -33,9 +33,9 @@ pow_test_() ->
                 ?assertEqual(ok, element(1, Res)),
 
                 %% verify the beast
-                {ok, Soln} = Res,
+                {ok, {Nonce, Soln}} = Res,
                 {T2, Res2} = timer:tc(?TEST_MODULE, verify,
-                                      [<<"wsffgujnjkqhduihsahswgdf">>, 169, Soln, BigDiff]),
+                                      [<<"wsffgujnjkqhduihsahswgdf">>, Nonce, Soln, BigDiff]),
                 ?debugFmt("~nVerified in ~p microsecs~n~n", [T2]),
                 ?assertEqual(true, Res2)
         end}
@@ -45,8 +45,7 @@ pow_test_() ->
         fun() ->
                 %% Unlikely to succeed after 2 steps
                 SmallDiff = 256*2 + 1,
-                Res = ?TEST_MODULE:generate(<<"wsffgujnjkqhduihsahswgdf">>, 169,
-                                            SmallDiff, 7, 5, 2),
+                Res = ?TEST_MODULE:generate(<<"wsffgujnjkqhduihsahswgdf">>, SmallDiff, 2),
                 ?debugFmt("Received result ~p~n", [Res]),
                 ?assertEqual({error, generation_count_exhausted}, Res)
         end}
@@ -75,5 +74,13 @@ misc_test_() ->
        end}
      ]
     }.
+
+setup() ->
+    meck:new(aec_pow, [passthrough]),
+    meck:expect(aec_pow, pick_nonce, fun() -> 169 end).
+
+teardown(_) ->
+    meck:validate(aec_pow),
+    meck:unload(aec_pow).
 
 -endif.
